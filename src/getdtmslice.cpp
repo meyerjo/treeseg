@@ -9,6 +9,8 @@ int main(int argc, char **argv)
 	float percentile = std::stof(args[1]);
 	float zmin = std::stof(args[2]);
 	float zmax = std::stof(args[3]);
+	std::cout << "resolution: " << resolution << " percentile: " << percentile << " zmin: " << zmin << " zmax: " << zmax << std::endl;
+	std::cout << "filename: " << args[4] << std::endl;
 	pcl::PointCloud<PointTreeseg>::Ptr plotcloud(new pcl::PointCloud<PointTreeseg>);
 	pcl::PCDWriter writer;
 	std::vector<std::string> id = getFileID(args[4]);
@@ -19,6 +21,7 @@ int main(int argc, char **argv)
 	std::vector<std::vector<float>> dem;
 	pcl::PointCloud<PointTreeseg>::Ptr slice(new pcl::PointCloud<PointTreeseg>);
 	dem = getDtmAndSlice(plotcloud,resolution,percentile,zmin,zmax,slice);
+	std::cout << "dem.size() " << dem.size() << std::endl;
 	for(int j=0;j<dem.size();j++) std::cout << dem[j][0] << " " << dem[j][1] << " " << dem[j][2] << std::endl;
 	writer.write(ss.str(),*slice,true);
 	return 0;

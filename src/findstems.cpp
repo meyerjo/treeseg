@@ -16,13 +16,17 @@ int main(int argc, char **argv)
 	pcl::PointCloud<PointTreeseg>::Ptr slice(new pcl::PointCloud<PointTreeseg>);
 	reader.read(args[4],*slice);
 	std::cout << "complete" << std::endl;
+	std::cout << "read " << slice->size() << " points" << std::endl;
 	//
 	std::cout << "Cluster extraction: " << std::flush;
 	std::vector<pcl::PointCloud<PointTreeseg>::Ptr> clusters;
 	int nnearest = 18;
 	int nmin = 100;
-	std::vector<float> nndata = dNN(slice,nnearest);
+	std::vector<float> nndata = dNN(slice, nnearest);
+	std::cout << "Clusters dNN: " << nndata.size() << std::endl;
+	std::cout << "mean: " << nndata[0] << " std: " << nndata[1] << std::endl;
 	euclideanClustering(slice,nndata[0],nmin,clusters);
+	std::cout << "euclideanClustering done. clusters.size(): " << clusters.size() << std::endl;
 	ss.str("");
 	ss << id[0] << ".intermediate.slice.clusters.pcd";
 	writeClouds(clusters,ss.str(),false);
@@ -50,6 +54,7 @@ int main(int argc, char **argv)
 	nnearest = 60;
 	float dmin = std::stof(args[1]);
 	float dmax = std::stof(args[2]);
+	std::cout << "opening file: " << args[3] << std::endl;
 	std::ifstream coordfile;
 	coordfile.open(args[3]);
 	float coords[4];
@@ -60,6 +65,7 @@ int main(int argc, char **argv)
 		{
 			coordfile >> coords[n];
 			n++;
+			std::cout << "reading coord " << n-1 << " value: " << coords[n-1] << std::endl;
 		}
 	}
 	coordfile.close();
@@ -67,11 +73,13 @@ int main(int argc, char **argv)
 	float xmax = coords[1];
 	float ymin = coords[2];
 	float ymax = coords[3];
+	std::cout << "read " << args[3] << ": x min, max" << xmin << ", " << xmax << "  y min, max" << ymin << ", " << ymax << std::endl;
 	float lmin = 2.5; //assumes 3m slice
 	float stepcovmax = 0.1;
 	float radratiomin = 0.9;
 	for(int i=0;i<regions.size();i++)
 	{
+	    std::cout << "handling region " << i << " of " << regions.size() << std::endl;
 		cylinder cyl;
 		fitCylinder(regions[i],nnearest,true,true,cyl);
 		//std::cout << cyl.ismodel << " " << cyl.rad << " " << cyl.len << " " << cyl.stepcov << " " << cyl.radratio << " " << cyl.x << " " << cyl.y << std::endl;
@@ -95,6 +103,7 @@ int main(int argc, char **argv)
 	std::sort(cylinders.rbegin(),cylinders.rend());
 	std::vector<pcl::PointCloud<PointTreeseg>::Ptr> cyls;
 	for(int i=0;i<cylinders.size();i++) cyls.push_back(cylinders[i].second);
+	std::cout << "start writing cylinders" << std::endl;
 	ss.str("");
 	ss << id[0] << ".intermediate.slice.clusters.regions.cylinders.pcd";
 	writeClouds(cyls,ss.str(),false);

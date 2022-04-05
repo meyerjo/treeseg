@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  treeseg:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # mounts for x forwarding
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
+      - "/tmp/.docker.xauth:/tmp/.docker.xauth"
+      - "./data/:/data"
+      - "./processing/:/processing"
+    environment:
+      - "QT_X11_NO_MITSHM=1"
+      - "XAUTHORITY=/tmp/.docker.xauth"
+      - "NVIDIA_VISIBLE_DEVICES=all"
+      - "NVIDIA_DRIVER_CAPABILITIES=all"
+      - "DISPLAY"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    restart: "no"
+    command: pcl_viewer /data/subpart.pcd

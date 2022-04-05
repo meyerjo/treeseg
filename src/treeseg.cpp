@@ -86,10 +86,15 @@ void readTiles(const std::vector<std::string> &args, pcl::PointCloud<PointTreese
 		{
 			if(tmp2[1] == "tile")
 			{
+			    std::cout << "reading tile data for file: " << args[i] << std::endl;
 				reader.read(args[i],*tmp);
 				*cloud += *tmp;
 				tmp->clear();	
+			} else {
+			    std::cout << "skipping file: " << args[i] << " ,because tmp2[1] != 'tile'" << tmp2[1] << std::endl;
 			}
+		} else {
+		    std::cout << "tmp2 length is " << tmp2.size() << " for filename: " << args[i] << std::endl;
 		}
 	}
 }
@@ -118,10 +123,12 @@ int getTilesStartIdx(const std::vector<std::string> &args)
 
 void writeClouds(const std::vector<pcl::PointCloud<PointTreeseg>::Ptr> &clouds, std::string fname, bool doPCA)
 {
+    std::cout << "writeClouds: " << clouds.size() << std::endl;
 	pcl::PCDWriter writer;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr out(new pcl::PointCloud<pcl::PointXYZRGB>);
 	for(int i=0;i<clouds.size();i++)
 	{
+	    std::cout << "\tpoints.size() " << clouds[i]->points.size() << std::endl;
 		int r = rand()%256;
 		int g = rand()%256;
 		int b = rand()%256;
